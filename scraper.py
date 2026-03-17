@@ -1,43 +1,37 @@
 import requests
 from bs4 import BeautifulSoup
 
-def get_ufc_data(url):
-    # This "User-Agent" makes you look like a real person on Chrome
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36',
-        'Accept-Language': 'en-US,en;q=0.9',
-    }
-    
+def get_ufc_data(url="http://ufcstats.com/statistics/events/upcoming"):
+    headers = {'User-Agent': 'Mozilla/5.0'}
     try:
         response = requests.get(url, headers=headers, timeout=10)
-        # If the UFC blocks us, this will raise an error we can catch
-        response.raise_for_status() 
-        
         soup = BeautifulSoup(response.text, 'html.parser')
+        
+        # Find the first upcoming event link
+        event_link = soup.find('td', class_='b-statistics__table-col').find('a')['href']
+        
+        # Now scrape that specific event page
+        event_response = requests.get(event_link, headers=headers)
+        event_soup = BeautifulSoup(event_response.text, 'html.parser')
+        
         fights = []
+        rows = event_soup.find_all('tr', class_='b-fight-details__table-row')[1:] # Skip header
         
-        # New selectors for the 2026 site layout
-        listings = soup.select('.c-listing-fight') 
-        
-        for fight in listings:
-            # We use .select_one to safely find names and records
-            red_name = fight.select_one('.c-listing-fight__corner--red .c-listing-athlete__name')
-            blue_name = fight.select_one('.c-listing-fight__corner--blue .c-listing-athlete__name')
-            red_rec = fight.select_one('.c-listing-fight__corner--red .c-listing-athlete__record')
-            blue_rec = fight.select_one('.c-listing-fight__corner--blue .c-listing-athlete__record')
-            weight = fight.select_one('.c-listing-fight__weight-class')
-
-            if red_name and blue_name:
+        for row in rows:
+            cols = row.find_all('td')
+            # Greco's logic for parsing names from the table
+            fighters = cols[1].find_all('a')
+            weight = cols[6].get_text(strip=True)
+            
+            if len(fighters) >= 2:
                 fights.append({
-                    "red_name": red_name.get_text(strip=True),
-                    "blue_name": blue_name.get_text(strip=True),
-                    "red_record": red_rec.get_text(strip=True) if red_rec else "0-0-0",
-                    "blue_record": blue_rec.get_text(strip=True) if blue_rec else "0-0-0",
-                    "weight": weight.get_text(strip=True) if weight else "TBD"
+                    "red_name": fighters[0].get_text(strip=True),
+                    "blue_name": fighters[1].get_text(strip=True),
+                    "red_record": "See Stats", # Records on ufcstats require a 3rd click
+                    "blue_record": "See Stats",
+                    "weight": weight
                 })
-        
         return fights
-
     except Exception as e:
-        print(f"Scrape failed: {e}")
+        print(f"Greco-style scrape failed: {e}")
         return []
