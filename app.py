@@ -6,7 +6,6 @@ app = Flask(__name__)
 
 @app.route("/")
 def home():
-    # Fight Date: March 21, 2026
     fight_date = "Mar 21, 2026 22:00:00"
 
     return f"""
@@ -15,103 +14,156 @@ def home():
             <title>UFC London: Scout & Arb Tracker</title>
             <meta name="viewport" content="width=device-width, initial-scale=1">
             <style>
-                body {{ font-family: 'Segoe UI', sans-serif; background-color: #0a0a0a; color: #fff; margin: 0; padding: 10px; }}
-                .wrapper {{ max-width: 600px; margin: auto; }}
-                h1 {{ font-size: 0.9em; color: #666; letter-spacing: 3px; text-align: center; text-transform: uppercase; margin-top: 20px; }}
-                .main-event-title {{ font-size: 1.4em; text-align: center; font-weight: 900; margin: 10px 0; }}
-                #timer {{ text-align: center; font-size: 2.2em; color: #d32f2f; margin-bottom: 20px; font-family: monospace; }}
+                body {{ font-family: 'Segoe UI', sans-serif; background-color: #0a0a0a; color: #fff; margin: 0; padding: 15px; }}
+                h1 {{ font-size: 0.9em; color: #666; letter-spacing: 4px; text-align: center; text-transform: uppercase; }}
+                .main-event-title {{ font-size: 1.8em; text-align: center; font-weight: 900; margin: 10px 0; }}
+                #timer {{ text-align: center; font-size: 2.5em; color: #d32f2f; margin-bottom: 30px; font-family: monospace; }}
                 
-                .section-header {{ background: #1a1a1a; color: #888; padding: 6px 15px; font-size: 0.7em; font-weight: bold; margin-top: 15px; display: flex; justify-content: space-between; border-left: 3px solid #d32f2f; }}
-                .match-row {{ background: #141414; padding: 12px 15px; border-bottom: 1px solid #222; display: flex; align-items: center; justify-content: space-between; }}
+                /* Layout Container */
+                .card-container {{ display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }}
+                .card-column {{ flex: 1; min-width: 320px; max-width: 500px; }}
+                
+                .section-header {{ background: #1a1a1a; color: #eee; padding: 10px 15px; font-size: 0.8em; font-weight: bold; margin-top: 10px; border-left: 4px solid #d32f2f; text-transform: uppercase; }}
+                .match-row {{ background: #141414; padding: 12px; border-bottom: 1px solid #222; display: flex; align-items: center; justify-content: space-between; }}
                 
                 .fighter-info {{ flex: 2; }}
-                .fighter-name {{ font-weight: bold; font-size: 0.95em; color: #eee; }}
+                .fighter-name {{ font-weight: bold; font-size: 0.9em; }}
                 .record {{ font-size: 0.75em; color: #666; }}
-                .weight-class {{ font-size: 0.65em; color: #d32f2f; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }}
+                .weight {{ font-size: 0.65em; color: #d32f2f; text-transform: uppercase; }}
                 
-                .odds-container {{ flex: 1; display: flex; justify-content: flex-end; gap: 8px; text-align: center; }}
-                .odds-box {{ width: 65px; }}
-                .price {{ background: #222; padding: 4px; border-radius: 4px; font-weight: bold; color: #ffcc00; display: block; font-size: 0.85em; }}
-                .prob {{ font-size: 0.65em; color: #444; font-weight: bold; }}
+                .odds-container {{ flex: 1; display: flex; justify-content: flex-end; gap: 5px; }}
+                .price {{ background: #222; padding: 4px 6px; border-radius: 4px; font-weight: bold; color: #ffcc00; font-size: 0.8em; min-width: 45px; text-align: center; }}
                 
-                .rank {{ color: #d32f2f; font-size: 0.8em; margin-right: 3px; font-weight: bold; }}
-                .debut-badge {{ color: #ffd700; font-weight: bold; font-size: 0.85em; text-shadow: 0 0 5px rgba(255,215,0,0.5); }}
-                .vs {{ color: #444; font-size: 0.8em; margin: 0 5px; }}
+                .rank {{ color: #d32f2f; font-weight: bold; }}
+                .debut {{ color: #ffd700; font-weight: bold; text-shadow: 0 0 5px rgba(255,215,0,0.5); font-size: 0.8em; }}
+                .vs {{ color: #444; margin: 0 5px; }}
             </style>
         </head>
         <body>
-            <div class="wrapper">
-                <h1>UFC Fight Night: London</h1>
-                <div class="main-event-title">EVLOEV <span style="color:#444">vs</span> MURPHY</div>
-                <div id="timer">00d 00h 00m 00s</div>
+            <h1>UFC Fight Night: London</h1>
+            <div class="main-event-title">EVLOEV <span style="color:#444">vs</span> MURPHY</div>
+            <div id="timer">00d 00h 00m 00s</div>
 
-                <div class="section-header"><span>Main Card</span><span>Odds / Implied %</span></div>
-
-                <div class="match-row">
-                    <div class="fighter-info">
-                        <div class="fighter-name"><span class="rank">#1</span>Evloev <span class="vs">vs</span> <span class="rank">#3</span>Murphy</div>
-                        <div class="record">19-0 <span class="vs">|</span> 17-0-1</div>
-                        <div class="weight-class">Featherweight</div>
+            <div class="card-container">
+                <div class="card-column">
+                    <div class="section-header">Main Card</div>
+                    <div class="match-row">
+                        <div class="fighter-info">
+                            <div class="fighter-name"><span class="rank">#1</span> Evloev <span class="vs">vs</span> <span class="rank">#3</span> Murphy</div>
+                            <div class="record">19-0 <span class="vs">|</span> 17-0-1</div>
+                            <div class="weight">Featherweight</div>
+                        </div>
+                        <div class="odds-container"><span class="price">-218</span><span class="price">+180</span></div>
                     </div>
-                    <div class="odds-container"><div class="odds-box"><span class="price">-218</span><span class="prob">68.6%</span></div><div class="odds-box"><span class="price">+180</span><span class="prob">35.7%</span></div></div>
+                    <div class="match-row">
+                        <div class="fighter-info">
+                            <div class="fighter-name">Luke Riley <span class="debut">[D]</span> <span class="vs">vs</span> Aswell Jr.</div>
+                            <div class="record">10-0 <span class="vs">|</span> 13-1</div>
+                            <div class="weight">Featherweight</div>
+                        </div>
+                        <div class="odds-container"><span class="price">-350</span><span class="price">+275</span></div>
+                    </div>
+                    <div class="match-row">
+                        <div class="fighter-info">
+                            <div class="fighter-name"><span class="rank">#14</span> Page <span class="vs">vs</span> Patterson</div>
+                            <div class="record">22-3 <span class="vs">|</span> 11-2-1</div>
+                            <div class="weight">Welterweight</div>
+                        </div>
+                        <div class="odds-container"><span class="price">-110</span><span class="price">-110</span></div>
+                    </div>
+                    <div class="match-row">
+                        <div class="fighter-info">
+                            <div class="fighter-name">Iwo Baraniewski <span class="debut">[D]</span> <span class="vs">vs</span> Austen Lane</div>
+                            <div class="record">14-0 <span class="vs">|</span> 13-5</div>
+                            <div class="weight">Light Heavyweight</div>
+                        </div>
+                        <div class="odds-container"><span class="price">-250</span><span class="price">+200</span></div>
+                    </div>
+                    <div class="match-row">
+                        <div class="fighter-info">
+                            <div class="fighter-name"><span class="rank">#11</span> Dolidze <span class="vs">vs</span> Duncan</div>
+                            <div class="record">13-3 <span class="vs">|</span> 11-1</div>
+                            <div class="weight">Middleweight</div>
+                        </div>
+                        <div class="odds-container"><span class="price">+145</span><span class="price">-175</span></div>
+                    </div>
+                    <div class="match-row">
+                        <div class="fighter-info">
+                            <div class="fighter-name">Kurtis Campbell <span class="debut">[D]</span> <span class="vs">vs</span> Danny Silva</div>
+                            <div class="record">8-0 <span class="vs">|</span> 11-2</div>
+                            <div class="weight">Featherweight</div>
+                        </div>
+                        <div class="odds-container"><span class="price">-150</span><span class="price">+125</span></div>
+                    </div>
                 </div>
 
-                <div class="match-row">
-                    <div class="fighter-info">
-                        <div class="fighter-name">Luke Riley <span class="debut-badge">[D]</span> <span class="vs">vs</span> Aswell Jr.</div>
-                        <div class="record">10-0 <span class="vs">|</span> 13-1</div>
-                        <div class="weight-class">Featherweight</div>
+                <div class="card-column">
+                    <div class="section-header">Prelims</div>
+                    <div class="match-row">
+                        <div class="fighter-info">
+                            <div class="fighter-name">Mason Jones <span class="vs">vs</span> Axel Sola</div>
+                            <div class="record">14-2 <span class="vs">|</span> 8-0</div>
+                            <div class="weight">Lightweight</div>
+                        </div>
+                        <div class="odds-container"><span class="price">-180</span><span class="price">+150</span></div>
                     </div>
-                    <div class="odds-container"><div class="odds-box"><span class="price">-350</span><span class="prob">77.8%</span></div><div class="odds-box"><span class="price">+275</span><span class="prob">26.7%</span></div></div>
-                </div>
-
-                <div class="match-row">
-                    <div class="fighter-info">
-                        <div class="fighter-name"><span class="rank">#14</span>Page <span class="vs">vs</span> Patterson</div>
-                        <div class="record">22-3 <span class="vs">|</span> 11-2-1</div>
-                        <div class="weight-class">Welterweight</div>
+                    <div class="match-row">
+                        <div class="fighter-info">
+                            <div class="fighter-name">Wood <span class="vs">vs</span> Keita <span class="debut">[D]</span></div>
+                            <div class="record">20-6 <span class="vs">|</span> 13-1</div>
+                            <div class="weight">Featherweight</div>
+                        </div>
+                        <div class="odds-container"><span class="price">-120</span><span class="price">+100</span></div>
                     </div>
-                    <div class="odds-container"><div class="odds-box"><span class="price">-110</span><span class="prob">52.4%</span></div><div class="odds-box"><span class="price">-110</span><span class="prob">52.4%</span></div></div>
-                </div>
-
-                <div class="match-row">
-                    <div class="fighter-info">
-                        <div class="fighter-name">Baraniewski <span class="debut-badge">[D]</span> <span class="vs">vs</span> Lane</div>
-                        <div class="record">14-0 <span class="vs">|</span> 13-5</div>
-                        <div class="weight-class">Heavyweight</div>
+                    <div class="match-row">
+                        <div class="fighter-info">
+                            <div class="fighter-name">Louie Sutherland <span class="vs">vs</span> Brando Peričić</div>
+                            <div class="record">7-2 <span class="vs">|</span> 6-0</div>
+                            <div class="weight">Heavyweight</div>
+                        </div>
+                        <div class="odds-container"><span class="price">-140</span><span class="price">+115</span></div>
                     </div>
-                    <div class="odds-container"><div class="odds-box"><span class="price">-250</span><span class="prob">71.4%</span></div><div class="odds-box"><span class="price">+200</span><span class="prob">33.3%</span></div></div>
-                </div>
-
-                <div class="match-row">
-                    <div class="fighter-info">
-                        <div class="fighter-name"><span class="rank">#11</span>Dolidze <span class="vs">vs</span> Duncan</div>
-                        <div class="record">13-3 <span class="vs">|</span> 11-1</div>
-                        <div class="weight-class">Middleweight</div>
+                    <div class="match-row">
+                        <div class="fighter-info">
+                            <div class="fighter-name">Kondratavičius <span class="debut">[D]</span> <span class="vs">vs</span> Trócoli</div>
+                            <div class="record">6-0 <span class="vs">|</span> 12-4</div>
+                            <div class="weight">Middleweight</div>
+                        </div>
+                        <div class="odds-container"><span class="price">-225</span><span class="price">+185</span></div>
                     </div>
-                    <div class="odds-container"><div class="odds-box"><span class="price">+145</span><span class="prob">40.8%</span></div><div class="odds-box"><span class="price">-175</span><span class="prob">63.6%</span></div></div>
-                </div>
-
-                <div class="section-header"><span>Prelims</span><span>Odds / Implied %</span></div>
-
-                <div class="match-row">
-                    <div class="fighter-info">
-                        <div class="fighter-name">Wood <span class="vs">vs</span> Keita <span class="debut-badge">[D]</span></div>
-                        <div class="record">20-6 <span class="vs">|</span> 13-1</div>
-                        <div class="weight-class">Featherweight</div>
+                    <div class="match-row">
+                        <div class="fighter-info">
+                            <div class="fighter-name"><span class="rank">#15</span> Mario Pinto <span class="vs">vs</span> Felipe Franco <span class="debut">[D]</span></div>
+                            <div class="record">9-0 <span class="vs">|</span> 8-0</div>
+                            <div class="weight">Heavyweight</div>
+                        </div>
+                        <div class="odds-container"><span class="price">-200</span><span class="price">+165</span></div>
                     </div>
-                    <div class="odds-container"><div class="odds-box"><span class="price">-120</span><span class="prob">54.5%</span></div><div class="odds-box"><span class="price">+100</span><span class="prob">50.0%</span></div></div>
-                </div>
-
-                <div class="match-row">
-                    <div class="fighter-info">
-                        <div class="fighter-name">Kondratavičius <span class="debut-badge">[D]</span> <span class="vs">vs</span> Trocoli</div>
-                        <div class="record">6-0 <span class="vs">|</span> 12-4</div>
-                        <div class="weight-class">Middleweight</div>
+                    <div class="match-row">
+                        <div class="fighter-info">
+                            <div class="fighter-name">Shem Rock <span class="vs">vs</span> Al-Selwady</div>
+                            <div class="record">10-1-1 <span class="vs">|</span> 15-2</div>
+                            <div class="weight">Lightweight</div>
+                        </div>
+                        <div class="odds-container"><span class="price">+110</span><span class="price">-135</span></div>
                     </div>
-                    <div class="odds-container"><div class="odds-box"><span class="price">-225</span><span class="prob">69.2%</span></div><div class="odds-box"><span class="price">+185</span><span class="prob">35.1%</span></div></div>
+                    <div class="match-row">
+                        <div class="fighter-info">
+                            <div class="fighter-name">Shanelle Dyer <span class="debut">[D]</span> <span class="vs">vs</span> Oliveira</div>
+                            <div class="record">5-0 <span class="vs">|</span> 7-2</div>
+                            <div class="weight">Strawweight</div>
+                        </div>
+                        <div class="odds-container"><span class="price">-300</span><span class="price">+240</span></div>
+                    </div>
+                    <div class="match-row">
+                        <div class="fighter-info">
+                            <div class="fighter-name">Melissa Mullins <span class="vs">vs</span> Luana Carolina</div>
+                            <div class="record">6-1 <span class="vs">|</span> 10-5</div>
+                            <div class="weight">Bantamweight</div>
+                        </div>
+                        <div class="odds-container"><span class="price">-115</span><span class="price">-105</span></div>
+                    </div>
                 </div>
-
             </div>
 
             <script>
