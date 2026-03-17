@@ -2,3 +2,6 @@ Flask
 gunicorn
 beautifulsoup4
 requests
+pandas
+numpy
+git+https://github.com/Greco1899/scrape_ufc_stats.git
