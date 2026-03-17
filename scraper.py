@@ -1,30 +1,40 @@
-from scrape_ufc_stats_library import get_soup, get_event_urls
 import requests
+from bs4 import BeautifulSoup
 
 def get_ufc_data():
-    # Direct link to London Event Stats
-    url = "http://ufcstats.com/event-details/7f8379c614b03734"
+    # This is the exact ID for the London 2026 card on UFCStats
+    url = "http://ufcstats.com/event-details/69108cb8b32efe04"
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36'}
     
     try:
-        soup = get_soup(url)
+        response = requests.get(url, headers=headers, timeout=10)
+        soup = BeautifulSoup(response.text, 'html.parser')
+        
+        # We need to find the table first. If this is None, we return empty to avoid the crash.
+        table = soup.find('table', class_='b-fight-details__table')
+        if not table:
+            print("Table not found - page layout may have changed.")
+            return []
+
         fights = []
+        rows = table.find_all('tr', class_='b-fight-details__table-row')
         
-        # This targets the specific table rows Greco's library looks for
-        rows = soup.find_all('tr', class_='b-fight-details__table-row')
-        
-        for row in rows[1:]:  # Skip header
-            cols = row.find_all('td')
-            # Paragraph tags contain the fighter names
-            names = cols[1].find_all('p')
+        for row in rows:
+            # Greco's logic uses 'b-fight-details__table-text' for fighter names
+            names = row.find_all('p', class_='b-fight-details__table-text')
             
-            fights.append({
-                "red_name": names[0].get_text(strip=True),
-                "blue_name": names[1].get_text(strip=True),
-                "weight": cols[6].get_text(strip=True),
-                "red_record": "Live Stats", 
-                "blue_record": "Live Stats"
-            })
-        return fights
+            if len(names) >= 2:
+                fights.append({
+                    "red_name": names[0].get_text(strip=True),
+                    "blue_name": names[1].get_text(strip=True),
+                    "weight": row.find_all('td')[6].get_text(strip=True),
+                    "red_record": "Live",
+                    "blue_record": "Live"
+                })
+        
+        # The first row is usually empty/header, so we return from index 1 onwards
+        return fights[1:] if len(fights) > 1 else fights
+
     except Exception as e:
-        print(f"Library Error: {e}")
+        print(f"Scrape failed: {e}")
         return []
