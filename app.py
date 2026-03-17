@@ -6,30 +6,48 @@ app = Flask(__name__)
 
 @app.route("/")
 def home():
-    # 1. Set the date of the next big fight (Example: UFC 313)
-    # Format: Year, Month, Day, Hour (24h), Minute
-    fight_date = datetime(2026, 3, 21, 22, 0, 0) 
-    
-    # 2. Get the current time
-    now = datetime.now()
-    
-    # 3. Calculate the difference
-    countdown = fight_date - now
-    
-    # 4. Break it down into readable parts
-    days = countdown.days
-    hours, remainder = divmod(countdown.seconds, 3600)
-    minutes, _ = divmod(remainder, 60)
+    # Set your fight date here (March 21, 2026 at 10:00 PM)
+    fight_date = "Mar 21, 2026 22:00:00"
 
     return f"""
     <html>
-        <head><title>UFC Countdown</title></head>
-        <body style="text-align: center; font-family: sans-serif; margin-top: 50px;">
-            <h1>Next Big UFC Event</h1>
-            <div style="font-size: 2em; color: #d32f2f;">
-                {days}d : {hours}h : {minutes}m
+        <head>
+            <title>UFC Live Countdown</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+        </head>
+        <body style="text-align: center; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin-top: 100px; background-color: #1a1a1a; color: white;">
+            <h1>NEXT BIG UFC EVENT</h1>
+            <div id="timer" style="font-size: 3em; font-weight: bold; color: #d32f2f; margin: 20px 0;">
+                Loading...
             </div>
-            <p>Live on your Flask App</p>
+            <p style="color: #888;">Live from your Render App</p>
+
+            <script>
+                // The date we are counting down to
+                var countDownDate = new Date("{fight_date}").getTime();
+
+                // Update the count down every 1 second
+                var x = setInterval(function() {{
+                    var now = new Date().getTime();
+                    var distance = countDownDate - now;
+
+                    // Time calculations for days, hours, minutes and seconds
+                    var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                    var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                    var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                    // Output the result in the element with id="timer"
+                    document.getElementById("timer").innerHTML = days + "d " + hours + "h "
+                    + minutes + "m " + seconds + "s ";
+
+                    // If the count down is over, write some text 
+                    if (distance < 0) {{
+                        clearInterval(x);
+                        document.getElementById("timer").innerHTML = "FIGHT TIME!";
+                    }}
+                }}, 1000);
+            </script>
         </body>
     </html>
     """
