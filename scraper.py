@@ -2,25 +2,42 @@ import requests
 from bs4 import BeautifulSoup
 
 def get_ufc_data(url):
-    headers = {'User-Agent': 'Mozilla/5.0'}
-    response = requests.get(url, headers=headers)
-    soup = BeautifulSoup(response.text, 'html.parser')
+    # This "User-Agent" makes you look like a real person on Chrome
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36',
+        'Accept-Language': 'en-US,en;q=0.9',
+    }
     
-    fights = []
-    # UFC uses 'c-listing-athlete__name' and 'c-listing-athlete__record' classes
-    # This logic finds each fight card block on the event page
-    listings = soup.find_all('div', class_='c-listing-fight')
-    
-    for fight in listings:
-        red_corner = fight.find('div', class_='c-listing-fight__corner--red')
-        blue_corner = fight.find('div', class_='c-listing-fight__corner--blue')
+    try:
+        response = requests.get(url, headers=headers, timeout=10)
+        # If the UFC blocks us, this will raise an error we can catch
+        response.raise_for_status() 
         
-        if red_corner and blue_corner:
-            fights.append({
-                "red_name": red_corner.find('div', class_='c-listing-athlete__name').text.strip(),
-                "red_record": red_corner.find('div', class_='c-listing-athlete__record').text.strip(),
-                "blue_name": blue_corner.find('div', class_='c-listing-athlete__name').text.strip(),
-                "blue_record": blue_corner.find('div', class_='c-listing-athlete__record').text.strip(),
-                "weight": fight.find('div', class_='c-listing-fight__weight-class').text.strip()
-            })
-    return fights
+        soup = BeautifulSoup(response.text, 'html.parser')
+        fights = []
+        
+        # New selectors for the 2026 site layout
+        listings = soup.select('.c-listing-fight') 
+        
+        for fight in listings:
+            # We use .select_one to safely find names and records
+            red_name = fight.select_one('.c-listing-fight__corner--red .c-listing-athlete__name')
+            blue_name = fight.select_one('.c-listing-fight__corner--blue .c-listing-athlete__name')
+            red_rec = fight.select_one('.c-listing-fight__corner--red .c-listing-athlete__record')
+            blue_rec = fight.select_one('.c-listing-fight__corner--blue .c-listing-athlete__record')
+            weight = fight.select_one('.c-listing-fight__weight-class')
+
+            if red_name and blue_name:
+                fights.append({
+                    "red_name": red_name.get_text(strip=True),
+                    "blue_name": blue_name.get_text(strip=True),
+                    "red_record": red_rec.get_text(strip=True) if red_rec else "0-0-0",
+                    "blue_record": blue_rec.get_text(strip=True) if blue_rec else "0-0-0",
+                    "weight": weight.get_text(strip=True) if weight else "TBD"
+                })
+        
+        return fights
+
+    except Exception as e:
+        print(f"Scrape failed: {e}")
+        return []

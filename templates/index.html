@@ -11,3 +11,9 @@
     </div>
 </div>
 {% endfor %}
+
+{% if not main_card %}
+    <div style="text-align: center; color: #ffcc00; padding: 20px;">
+        ⚠️ Live data currently unavailable. The UFC site may be blocking the request.
+    </div>
+{% endif %}
