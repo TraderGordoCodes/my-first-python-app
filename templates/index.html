@@ -1,0 +1,13 @@
+{% for fight in main_card %}
+<div class="match-row">
+    <div class="fighter-info">
+        <div class="fighter-name">{{ fight.red_name }} vs {{ fight.blue_name }}</div>
+        <div class="record">{{ fight.red_record }} | {{ fight.blue_record }}</div>
+        <div class="weight">{{ fight.weight }}</div>
+    </div>
+    <div class="odds-container">
+        <span class="price">TBD</span>
+        <span class="price">TBD</span>
+    </div>
+</div>
+{% endfor %}
