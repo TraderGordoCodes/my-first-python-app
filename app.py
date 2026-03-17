@@ -1,3 +1,4 @@
+import os
 from flask import Flask
 from datetime import datetime
 
@@ -34,4 +35,6 @@ def home():
     """
 
 if __name__ == "__main__":
-    app.run(debug=True, host='0.0.0.0')
+    # Get the port from Render's environment, or use 5000 as a backup
+    port = int(os.environ.get("PORT", 5000))
+    app.run(debug=True, host='0.0.0.0', port=port)
